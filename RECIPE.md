@@ -6,7 +6,7 @@ A side panel that streams one PostHog project's events as they arrive. You get t
 
 ## What you see
 
-The panel fills its block, top to bottom. Colors are theme names, so the panel follows the person's theme. The values in brackets are the neon theme in the preview.
+The panel fills its block, top to bottom. Colors are theme names, so the panel follows the person's theme. The values in brackets are the [Nightdrive](https://github.com/BenGlasser/herdr-nightdrive) theme in the preview.
 
 - **Frame:** `background` (`#05030a`) with a 1px `border` (`#2e1f55`) all round. The UI font is 13px in `foreground` (`#f3eeff`).
 - **Header, 42px**, with 14px side padding, 8px gaps and a 1px `border` line under it. From left to right:
