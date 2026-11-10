@@ -50,4 +50,6 @@ It works on macOS only, because of the Keychain and `open`.
 
 [`RECIPE.md`](RECIPE.md) is the full brief: the exact look, behavior, query, limits, and checks that prove a build works. An agent can rebuild the mod from it in an empty folder.
 
-The title font is Press Start 2P, under the SIL Open Font License ([`mods/posthog/fonts/OFL.txt`](mods/posthog/fonts/OFL.txt)).
+## License
+
+[MIT](LICENSE), except the title font, Press Start 2P, which keeps its own SIL Open Font License ([`mods/posthog/fonts/OFL.txt`](mods/posthog/fonts/OFL.txt)).
