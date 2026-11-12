@@ -1,6 +1,8 @@
 # PostHog Feed for Herdr
 
-A [Herdr](https://herdr.dev) side panel that shows one PostHog project's events live as they arrive. The newest event is on top, with who did it, on what platform, on which screen or page, and how late it landed. Type to filter, and click an event to open it in PostHog. Add one panel per project, for example Staging and Prod next to Files and Changes.
+A [Herdr](https://herdr.dev) side panel that shows one PostHog project's events live as they arrive. The newest event is on top, with who did it, on what platform, on which screen or page, and how late it landed. Type to filter, and click an event to open it in PostHog. Add one panel per project, for example Staging and Prod.
+
+It works in any layout: it takes the colors of your theme and the font of your layout. In the [Nightdrive](https://github.com/BenGlasser/herdr-nightdrive) layout its title takes Nightdrive's pixel face.
 
 ![PostHog Feed](preview.png)
 
@@ -13,38 +15,45 @@ The simplest way is to ask the agent in your Herdr window:
 Or do it by hand:
 
 1. Copy `mods/posthog/` to `~/.config/herdr-app/mods/posthog/`.
-2. Add a block for each project to one of your own layouts. Herdr's shipped layouts are read-only, so first make a copy with `herdr-app do layout.clone '{"name":"main","as":"my-layout"}'`.
+2. Run `herdr-app check ~/.config/herdr-app/mods/posthog`.
 
-   ```json
-   { "id": "posthog-prod", "type": "block",
-     "content": { "mod": "posthog",
-                  "props": { "project": 12345, "label": "Prod", "prod": true, "block": "posthog-prod" } } }
-   ```
-
-3. Run `herdr-app check ~/.config/herdr-app/mods/posthog`.
-4. Restart Herdr once, so it loads the bundled pixel font for the panel title.
+Herdr docks it on the right of the layout you're in, the first time it sees it. Herdr's shipped layouts are read-only, so it waits for one of your own; make one with `herdr-app do layout.clone '{"name":"main","as":"my-layout"}'`.
 
 ## Setup
 
+The first time the panel opens it asks three things:
+
+1. **Cloud:** US or EU.
+2. **Key:** a PostHog **personal API key** (`phx_…`) with the **Query: Read** and **Project: Read** scopes. It's checked with PostHog, then kept in your system keychain (the macOS Keychain, or the Secret Service on Linux; service `posthog-feed`, account = the host). Every panel on that host uses the same key.
+3. **Project:** pick one from the projects the key can see, or type its id (the number after `/project/` in its URL). Click the project's name in the header to change it later.
+
+### More than one project
+
+Give each panel its own block in your layout, with its project in its props. Panels set this way skip the picker:
+
+```json
+{ "id": "posthog-prod", "type": "block",
+  "content": { "mod": "posthog",
+               "props": { "project": 12345, "label": "Prod", "prod": true, "block": "posthog-prod" } } }
+```
+
 | Prop | Meaning |
 |---|---|
-| `project` | **Required.** The project id: the number after `/project/` in the project's PostHog URL. |
-| `label` | The text in the header chip. Default: `Project <id>`. |
+| `project` | The project id. Without it, the panel asks. |
+| `label` | The text in the header chip. Default: the project's name. |
 | `prod` | `true` makes the chip red, so production stands out. |
 | `host` | Default `https://us.posthog.com`. For EU projects, use `https://eu.posthog.com`. |
 | `block` | This block's `id` in the layout, so the panel can pause while it's hidden. |
 
-The first time a panel opens, it asks for a PostHog **personal API key** (`phx_…`) with the **Query: Read** scope. It checks the key against the project, then saves it in the macOS Keychain (service `posthog-feed`, account = the host). Every panel on that host uses the same key.
-
 ## What it accesses
 
-- **Network:** PostHog's query API (`POST <host>/api/projects/<project>/query/`), every 10 seconds while the panel is on screen. It stops while the panel is hidden and catches up when it's shown again.
+- **Network:** PostHog's query API (`POST <host>/api/projects/<project>/query/`), every 10 seconds while the panel is on screen. It stops while the panel is hidden and catches up when it's shown again. For the picker, once: `GET <host>/api/projects/`.
 - **Programs:**
-  - `security`, to read and save the key in the Keychain
-  - `open`, to open events and the key page in your browser
+  - `security` (macOS) or `secret-tool` (Linux), to read and keep the key
+  - `open` (macOS) or `xdg-open` (Linux), to open events and the key page in your browser
 - **Files:** none outside its own folder.
 
-It works on macOS only, because of the Keychain and `open`.
+It works on macOS and Linux.
 
 ## More
 
@@ -52,4 +61,4 @@ It works on macOS only, because of the Keychain and `open`.
 
 ## License
 
-[MIT](LICENSE), except the title font, Press Start 2P, which keeps its own SIL Open Font License ([`mods/posthog/fonts/OFL.txt`](mods/posthog/fonts/OFL.txt)).
+[MIT](LICENSE).
